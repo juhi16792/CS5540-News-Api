@@ -27,8 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         mNewsTextView = (TextView) findViewById(R.id.news_data);
         spinner = (ProgressBar) findViewById((R.id.progressBar1));
-
-        loadNewsData();
+        spinner.setVisibility(View.GONE);
 
     }
     @Override
@@ -40,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.search) {
+            mNewsTextView.setText("");
             NetworkRequests task = new NetworkRequests();
             task.execute();
         }
