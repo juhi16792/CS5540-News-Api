@@ -3,11 +3,18 @@ package com.example.juhi.newsapp.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.juhi.newsapp.model.NewsItem;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import static android.content.ContentValues.TAG;
@@ -67,5 +74,26 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+
+    //parse JSON to ArrayList
+    public static ArrayList<NewsItem> parseJSON(String json) throws JSONException{
+        ArrayList<NewsItem> result = new ArrayList<>();
+        JSONObject main = new JSONObject(json);
+        JSONArray items = main.getJSONArray("articles");
+
+        for(int i = 0; i < items.length(); i++){
+            JSONObject item = items.getJSONObject(i);
+            String author = item.getString("author");
+            String title = item.getString("title");
+            String description = item.getString("description");
+            String url = item.getString("url");
+            String urlToImage = item.getString("urlToImage");
+            String publishedDate = item.getString("publishedDate");
+            NewsItem newsItem = new NewsItem(author,title,description,url,urlToImage,publishedDate);
+            result.add(newsItem);
+        }
+        return result;
     }
 }
