@@ -21,7 +21,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
     ItemClickListener listener;
 
 
-    public NewsAdapter(){}
+
     public NewsAdapter(ArrayList<NewsItem> data, ItemClickListener listener){
         this.data = data;
         this.listener = listener;
@@ -70,7 +70,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
             NewsItem newsItem = data.get(pos);
             title.setText(newsItem.getTitle());
             description.setText(newsItem.getDescription());
-            time.setText(newsItem.getPublishedDate());
+            time.setText(newsItem.getTime());
         }
 
         @Override

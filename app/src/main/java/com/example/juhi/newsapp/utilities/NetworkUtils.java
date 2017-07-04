@@ -17,8 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by juhi on 6/20/17.
  */
@@ -26,32 +24,25 @@ import static android.content.ContentValues.TAG;
 public class NetworkUtils {
 
     // declaring constants
-    final static String BASE_URL="https://newsapi.org/v1/articles";
-    final static String SORT_PARAM = "sortBy";
-    final static String API_PARAM = "apiKey";
-    final static String QUERY_PARAM = "source";
+    public static final String TAG = "NetworkUtils";
 
-    //assigning values of params
-    final static String api_key = "f436e71026e74ceeb4971162f542881f";
-    final static String sortBy = "latest";
+    public static final String BASE_URL = "https://newsapi.org/v1/articles?source=the-next-web&sortBy=latest&apiKey=f436e71026e74ceeb4971162f542881f";
+    public static final String PARAM_QUERY = "q";
+    public static final String PARAM_SORT = "sort";
 
-
-    //static url for now
-    public static URL buildUrl(){
+    public static URL makeURL(String searchQuery, String sortBy) {
         Uri uri = Uri.parse(BASE_URL).buildUpon()
-                .appendQueryParameter(QUERY_PARAM,"the-next-web")
-                .appendQueryParameter(SORT_PARAM,sortBy)
-                .appendQueryParameter(API_PARAM,api_key)
-                .build();
+                .appendQueryParameter(PARAM_QUERY, searchQuery)
+                .appendQueryParameter(PARAM_SORT, sortBy).build();
 
         URL url = null;
         try {
+            String urlString = uri.toString();
+            Log.d(TAG, "Url: " + urlString);
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-        Log.v(TAG, "Built URI " + url);
 
         return url;
     }
@@ -76,7 +67,6 @@ public class NetworkUtils {
         }
     }
 
-
     //parse JSON to ArrayList
     public static ArrayList<NewsItem> parseJSON(String json) throws JSONException{
         ArrayList<NewsItem> result = new ArrayList<>();
@@ -85,13 +75,11 @@ public class NetworkUtils {
 
         for(int i = 0; i < items.length(); i++){
             JSONObject item = items.getJSONObject(i);
-            String author = item.getString("author");
+            String time = item.getString("publishedAt");
             String title = item.getString("title");
             String description = item.getString("description");
             String url = item.getString("url");
-            String urlToImage = item.getString("urlToImage");
-            String publishedDate = item.getString("publishedDate");
-            NewsItem newsItem = new NewsItem(author,title,description,url,urlToImage,publishedDate);
+            NewsItem newsItem = new NewsItem(title,description,url, time);
             result.add(newsItem);
         }
         return result;

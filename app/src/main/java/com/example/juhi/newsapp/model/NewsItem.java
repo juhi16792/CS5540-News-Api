@@ -6,28 +6,25 @@ package com.example.juhi.newsapp.model;
 
 public class NewsItem {
 
-    private String author;
     private String title;
     private String description;
+    private String time;
     private String url;
-    private String urlToImage;
-    private String publishedDate;
 
-    public NewsItem(String author, String title, String description, String url, String urlToImage, String publishedDate) {
-        this.author = author;
+
+    public NewsItem(String title, String description, String url, String time) {
+        this.time = time;
         this.title = title;
         this.description = description;
         this.url = url;
-        this.urlToImage = urlToImage;
-        this.publishedDate = publishedDate;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getTime() {
+        return time;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getTitle() {
@@ -54,19 +51,4 @@ public class NewsItem {
         this.url = url;
     }
 
-    public String getUrlToImage() {
-        return urlToImage;
-    }
-
-    public void setUrlToImage(String urlToImage) {
-        this.urlToImage = urlToImage;
-    }
-
-    public String getPublishedDate() {
-        return publishedDate;
-    }
-
-    public void setPublishedDate(String publishedDate) {
-        this.publishedDate = publishedDate;
-    }
 }

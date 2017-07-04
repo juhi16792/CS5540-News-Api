@@ -16,96 +16,101 @@ import android.widget.ProgressBar;
 import com.example.juhi.newsapp.model.NewsItem;
 import com.example.juhi.newsapp.utilities.NetworkUtils;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static com.example.juhi.newsapp.R.menu.search;
+
 
 public class MainActivity extends AppCompatActivity {
-
-
     static final String TAG = "mainactivity";
-    private ProgressBar spinner;
+    private ProgressBar progress;
 
     private RecyclerView rv;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        spinner = (ProgressBar) findViewById((R.id.progressBar1));
-        spinner.setVisibility(View.GONE);
+        progress = (ProgressBar) findViewById(R.id.progressBar1);
 
         rv = (RecyclerView)findViewById(R.id.recyclerView);
+
         rv.setLayoutManager(new LinearLayoutManager(this));
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(search, menu);
+        getMenuInflater().inflate(R.menu.search, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.search) {
-            NetworkRequests task = new NetworkRequests();
+        int itemNumber = item.getItemId();
+
+        if (itemNumber == R.id.search) {
+            String s = "";
+            NetworkTask task = new NetworkTask(s);
             task.execute();
         }
+
         return true;
     }
-    private void loadNewsData(){
-        new NetworkRequests().execute();
-    }
-    public class NetworkRequests extends AsyncTask<URL, Void, ArrayList<NewsItem>> {
-      @Override
-      protected void onPreExecute (){
-          super.onPreExecute();
-          spinner.setVisibility(View.VISIBLE);
-      }
 
-      @Override
-      protected ArrayList<NewsItem> doInBackground(URL... params) {
+    class NetworkTask extends AsyncTask<URL, Void, ArrayList<NewsItem>>{
+        String query;
+        NetworkTask(String s) {
+            query = s;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progress.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
+        protected ArrayList<NewsItem> doInBackground(URL... params) {
             ArrayList<NewsItem> result = null;
-            URL builtURL = NetworkUtils.buildUrl();
+            URL url = NetworkUtils.makeURL(query, "stars");
+            Log.d(TAG, "url: " + url.toString());
             try {
-                String newsResponse = NetworkUtils
-                        .getResponseFromHttpUrl(builtURL);
-                String[] response = new String[1];
-                response[0] = newsResponse;
-                result = NetworkUtils.parseJSON(response[0]);
-
-            } catch (Exception e) {
+                String json = NetworkUtils.getResponseFromHttpUrl(url);
+                result = NetworkUtils.parseJSON(json);
+            } catch (IOException e) {
                 e.printStackTrace();
-                return null;
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-
             return result;
-      }
+        }
 
-      @Override
-      protected void onPostExecute(final ArrayList<NewsItem> newsData){
-            super.onPostExecute(newsData);
-            spinner.setVisibility(View.GONE);
-            if(newsData!=null) {
-                NewsAdapter adapter = new NewsAdapter(newsData, new NewsAdapter.ItemClickListener() {
+        @Override
+        protected void onPostExecute(final ArrayList<NewsItem> data) {
+            super.onPostExecute(data);
+            progress.setVisibility(View.GONE);
+            if (data != null) {
+                NewsAdapter adapter = new NewsAdapter(data, new NewsAdapter.ItemClickListener() {
                     @Override
                     public void onItemClick(int clickedItemIndex) {
-                        String url = newsData.get(clickedItemIndex).getUrl();
-                        Log.d(TAG, String.format("Url %s", url));
-                        openWebPage(url);
+                        String url = data.get(clickedItemIndex).getUrl();
+                        Log.d(TAG, url);
+                        Uri webpage = Uri.parse(url);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+                        if (intent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
                     }
                 });
                 rv.setAdapter(adapter);
-            }
-      }
-        public void openWebPage(String url) {
-            Uri webpage = Uri.parse(url);
-            Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
+
             }
         }
     }
