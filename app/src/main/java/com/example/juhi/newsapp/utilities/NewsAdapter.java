@@ -1,15 +1,15 @@
-package com.example.juhi.newsapp;
+package com.example.juhi.newsapp.utilities;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.juhi.newsapp.model.NewsItem;
-
-import java.util.ArrayList;
+import com.example.juhi.newsapp.R;
+import com.example.juhi.newsapp.data.Contract;
 
 /**
  * Created by juhi on 6/29/17.
@@ -17,18 +17,22 @@ import java.util.ArrayList;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
 
-    private ArrayList<NewsItem> data;
+    //private ArrayList<NewsItem> data; --> No need of ArrayList
     ItemClickListener listener;
 
 
+    // Task 4 :- Add Cursor
+    private Cursor cursor;
 
-    public NewsAdapter(ArrayList<NewsItem> data, ItemClickListener listener){
-        this.data = data;
+    //Task 4 :- Editing the constructor with cursor as the parameter
+    public NewsAdapter(Cursor cursor, ItemClickListener listener){
+        this.cursor = cursor;
         this.listener = listener;
     }
 
+    // Task 4 :- Adding cursor in item click listener
     public interface ItemClickListener {
-        void onItemClick(int clickedItemIndex);
+        void onListItemClick(Cursor cursor,int clickedItemIndex);
     }
 
     @Override
@@ -48,9 +52,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
         holder.bind(position);
     }
 
+    // Task 4 :- editing arraylist with cursor count
     @Override
     public int getItemCount() {
-        return data.size();
+        return cursor.getCount();
     }
 
     class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -67,16 +72,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
         }
 
         public void bind(int pos){
-            NewsItem newsItem = data.get(pos);
-            title.setText(newsItem.getTitle());
-            description.setText(newsItem.getDescription());
-            time.setText(newsItem.getTime());
+            cursor.moveToPosition(pos);
+
+            //Task 4 :- setting cursor index
+            title.setText(cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_TITLE)));
+            description.setText(cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_DESC)));
+            time.setText(cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_PUBLISHED_AT)));
         }
 
         @Override
         public void onClick(View v) {
-            int pos = getAdapterPosition();
-            listener.onItemClick(pos);
+            listener.onListItemClick(cursor,getAdapterPosition());
         }
     }
 }

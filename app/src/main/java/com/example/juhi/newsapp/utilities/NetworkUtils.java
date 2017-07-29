@@ -79,7 +79,9 @@ public class NetworkUtils {
             String title = item.getString("title");
             String description = item.getString("description");
             String url = item.getString("url");
-            NewsItem newsItem = new NewsItem(title,description,url, time);
+            String urlToImage = item.getString("urlToImage");
+            String author = item.getString("url");
+            NewsItem newsItem = new NewsItem(title,author,description,url,time,urlToImage);
             result.add(newsItem);
         }
         return result;
