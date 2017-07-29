@@ -6,6 +6,7 @@ package com.example.juhi.newsapp.model;
 
 public class NewsItem {
 
+    private String source;
     private String title;
     private String author;
     private String description;
@@ -14,14 +15,23 @@ public class NewsItem {
     private String urlToImage;
 
 
-//title,author,description,url,time,urlToImage
-    public NewsItem(String title, String author, String description, String url, String time, String urlToImage) {
+    //title,author,description,url,time,urlToImage
+    public NewsItem(String source,String title, String author, String description, String url, String time, String urlToImage) {
+        this.source = source;
         this.time = time;
         this.title = title;
         this.description = description;
         this.url = url;
         this.author = author;
         this.urlToImage = urlToImage;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getTime() {

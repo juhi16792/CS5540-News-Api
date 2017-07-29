@@ -25,16 +25,22 @@ public class NetworkUtils {
 
     // declaring constants
     public static final String TAG = "NetworkUtils";
+    final static String BASE_URL = "https://newsapi.org/v1/articles";
 
-    public static final String BASE_URL = "https://newsapi.org/v1/articles?source=the-next-web&sortBy=latest&apiKey=f436e71026e74ceeb4971162f542881f";
-    public static final String PARAM_QUERY = "q";
-    public static final String PARAM_SORT = "sort";
+    final static String SOURCE_PARAM = "source";
+    final static String SORT_PARAM = "sortBy";
+    final static String APIKEY_PARAM = "apiKey";
 
-    public static URL makeURL(String searchQuery, String sortBy) {
+    private final static String src = "reuters";
+    private final static String sort = "latest";
+    private final static String key = "f436e71026e74ceeb4971162f542881f";
+
+    public static URL makeURL() {
         Uri uri = Uri.parse(BASE_URL).buildUpon()
-                .appendQueryParameter(PARAM_QUERY, searchQuery)
-                .appendQueryParameter(PARAM_SORT, sortBy).build();
-
+                .appendQueryParameter(SOURCE_PARAM, src)
+                .appendQueryParameter(SORT_PARAM, sort)
+                .appendQueryParameter(APIKEY_PARAM, key)
+                .build();
         URL url = null;
         try {
             String urlString = uri.toString();
@@ -71,6 +77,7 @@ public class NetworkUtils {
     public static ArrayList<NewsItem> parseJSON(String json) throws JSONException{
         ArrayList<NewsItem> result = new ArrayList<>();
         JSONObject main = new JSONObject(json);
+        String source = main.getString("source");
         JSONArray items = main.getJSONArray("articles");
 
         for(int i = 0; i < items.length(); i++){
@@ -81,7 +88,7 @@ public class NetworkUtils {
             String url = item.getString("url");
             String urlToImage = item.getString("urlToImage");
             String author = item.getString("url");
-            NewsItem newsItem = new NewsItem(title,author,description,url,time,urlToImage);
+            NewsItem newsItem = new NewsItem(source,title,author,description,url,time,urlToImage);
             result.add(newsItem);
         }
         return result;

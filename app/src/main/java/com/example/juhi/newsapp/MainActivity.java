@@ -42,12 +42,12 @@ public abstract class MainActivity extends AppCompatActivity implements LoaderMa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mProgressIndicator = (ProgressBar) findViewById(R.id.progressBar1);
-
         rv = (RecyclerView)findViewById(R.id.recyclerView);
-
-        rv.setLayoutManager(new LinearLayoutManager(this));
-
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        rv.setLayoutManager(layoutManager);
+        rv.setHasFixedSize(true);
+        mProgressIndicator = (ProgressBar) findViewById(R.id.progressBar1);
+        
     }
 
 
