@@ -1,34 +1,33 @@
 package com.example.juhi.newsapp;
-
-import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.example.juhi.newsapp.model.NewsItem;
-import com.example.juhi.newsapp.utilities.NetworkUtils;
 
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
+// Adding loader manager and callbacks
+public abstract class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Void>,NewsAdapter.ItemClickListener {
+    // to uniquely identify the loader
+    private static final int LOADER = 1;
 
 
-
-public class MainActivity extends AppCompatActivity {
     static final String TAG = "mainactivity";
-    private ProgressBar progress;
-
+    private NewsAdapter newsAdapter;
+    private ProgressBar mProgressIndicator;
     private RecyclerView rv;
+
+
+    private SQLiteDatabase db; //Sqlite database instance
+    private Cursor cur; //cursor object
 
 
     @Override
@@ -36,13 +35,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        progress = (ProgressBar) findViewById(R.id.progressBar1);
+        mProgressIndicator = (ProgressBar) findViewById(R.id.progressBar1);
 
         rv = (RecyclerView)findViewById(R.id.recyclerView);
 
         rv.setLayoutManager(new LinearLayoutManager(this));
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,63 +55,40 @@ public class MainActivity extends AppCompatActivity {
         int itemNumber = item.getItemId();
 
         if (itemNumber == R.id.search) {
-            String s = "";
-            NetworkTask task = new NetworkTask(s);
-            task.execute();
+            LoaderManager loaderManager = getSupportLoaderManager();
+            loaderManager.restartLoader(LOADER,null,this).forceLoad();
+            return true;
         }
 
         return true;
     }
 
-    class NetworkTask extends AsyncTask<URL, Void, ArrayList<NewsItem>>{
-        String query;
-        NetworkTask(String s) {
-            query = s;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progress.setVisibility(View.VISIBLE);
-
-        }
-
-        @Override
-        protected ArrayList<NewsItem> doInBackground(URL... params) {
-            ArrayList<NewsItem> result = null;
-            URL url = NetworkUtils.makeURL(query, "stars");
-            Log.d(TAG, "url: " + url.toString());
-            try {
-                String json = NetworkUtils.getResponseFromHttpUrl(url);
-                result = NetworkUtils.parseJSON(json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
+    @Override
+    public Loader<Void> onCreateLoader(int id, Bundle args){
+        return new AsyncTaskLoader<Void>(this){
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                mProgressIndicator.setVisibility(View.VISIBLE);
             }
-            return result;
-        }
 
-        @Override
-        protected void onPostExecute(final ArrayList<NewsItem> data) {
-            super.onPostExecute(data);
-            progress.setVisibility(View.GONE);
-            if (data != null) {
-                NewsAdapter adapter = new NewsAdapter(data, new NewsAdapter.ItemClickListener() {
-                    @Override
-                    public void onItemClick(int clickedItemIndex) {
-                        String url = data.get(clickedItemIndex).getUrl();
-                        Log.d(TAG, url);
-                        Uri webpage = Uri.parse(url);
-                        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                        }
-                    }
-                });
-                rv.setAdapter(adapter);
-
+            @Override
+            public Void loadInBackground() {
+                // HW4: 7. Refresh articles method
+           //     NewsJob.refreshArticles(MainActivity.this);
+                return null;
             }
-        }
+        };
     }
+
+    @Override
+    public void onLoaderReset(Loader<Void> loader){}
+
+    @Override
+    public void onLoadFinished(Loader<Void> loader, Void data){
+        mProgressIndicator.setVisibility(View.INVISIBLE);
+    }
+
+    //Removed Network Task extending AsyncTask ---> Task 2
+
 }
