@@ -3,13 +3,16 @@ package com.example.juhi.newsapp.utilities;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.juhi.newsapp.R;
 import com.example.juhi.newsapp.data.Contract;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by juhi on 6/29/17.
@@ -17,12 +20,15 @@ import com.example.juhi.newsapp.data.Contract;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
 
+    private static final String TAG = NewsAdapter.class.getSimpleName();
     //private ArrayList<NewsItem> data; --> No need of ArrayList
     ItemClickListener listener;
 
 
     // Task 4 :- Add Cursor
     private Cursor cursor;
+
+    private Context context;
 
     //Task 4 :- Editing the constructor with cursor as the parameter
     public NewsAdapter(Cursor cursor, ItemClickListener listener){
@@ -37,7 +43,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
 
     @Override
     public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
+        context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
@@ -63,11 +69,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
         TextView description;
         TextView time;
 
+        //task 8 --> Add  image to recycler view
+        public final ImageView img;
+
         ItemHolder(View view){
             super(view);
             title = (TextView)view.findViewById(R.id.title);
             description = (TextView)view.findViewById(R.id.description);
             time = (TextView)view.findViewById(R.id.time);
+            img = (ImageView)view.findViewById(R.id.img);
             view.setOnClickListener(this);
         }
 
@@ -78,6 +88,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ItemHolder>{
             title.setText(cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_TITLE)));
             description.setText(cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_DESC)));
             time.setText(cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_PUBLISHED_AT)));
+
+            //Task 8 :- using picasso to load a thumbnail
+            String urlToImage = cursor.getString(cursor.getColumnIndex(Contract.NewsItem.COLUMN_IMAGE_URL));
+            Log.d(TAG, urlToImage);
+            if(urlToImage != null){
+                Picasso.with(context)
+                        .load(urlToImage)
+                        .into(img);
+            }
         }
 
         @Override
