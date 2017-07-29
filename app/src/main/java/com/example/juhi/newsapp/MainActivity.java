@@ -28,7 +28,7 @@ import com.example.juhi.newsapp.utilities.ScheduleUtils;
 
 
 // Adding loader manager and callbacks
-public abstract class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Void>,NewsAdapter.ItemClickListener {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Void>,NewsAdapter.ItemClickListener {
     // to uniquely identify the loader
     private static final int LOADER = 1;
 
@@ -62,7 +62,7 @@ public abstract class MainActivity extends AppCompatActivity implements LoaderMa
             LoaderManager loaderManager = getSupportLoaderManager();
             loaderManager.restartLoader(LOADER, null, this).forceLoad();
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("isfirst", false);
+            editor.putBoolean("isNotInstalled", false);
             editor.commit();
         }
         ScheduleUtils.scheduleRefresh(this);
